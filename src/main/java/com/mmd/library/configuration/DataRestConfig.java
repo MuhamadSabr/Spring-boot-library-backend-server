@@ -16,12 +16,10 @@ public class DataRestConfig implements RepositoryRestConfigurer {
 
         config.setBasePath("api");
 
-        //Global CORS Configuration
+        //CORS Configuration
         String allowedOrigin = "http://localhost:3000";
-
         cors.addMapping(config.getBasePath() + "/books/**")
                 .allowedOrigins(allowedOrigin);
-
         cors.addMapping(config.getBasePath() + "/reviews/**")
                 .allowedOrigins(allowedOrigin);
 
@@ -38,7 +36,7 @@ public class DataRestConfig implements RepositoryRestConfigurer {
 
     }
 
-    private void disableUnsupportedMethods(Class theClass, RepositoryRestConfiguration config, HttpMethod[] disabledHttpMethods){
+    private void disableUnsupportedMethods(Class<?> theClass, RepositoryRestConfiguration config, HttpMethod[] disabledHttpMethods){
         config.getExposureConfiguration()
                 .forDomainType(theClass)
                 .disablePutForCreation()
