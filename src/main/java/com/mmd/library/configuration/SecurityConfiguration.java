@@ -32,7 +32,7 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/login").permitAll()
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/login", "/api/books/**", "/api/reviews/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(fr -> fr.successHandler(authenticationSuccessHandler())
                                     .failureHandler(authenticationFailureHandler()))
