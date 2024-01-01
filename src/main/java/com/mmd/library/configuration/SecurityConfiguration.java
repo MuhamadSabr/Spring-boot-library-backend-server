@@ -1,5 +1,7 @@
 package com.mmd.library.configuration;
 
+import com.mmd.library.filter.JWTTokenGeneratorFilter;
+import com.mmd.library.filter.JWTTokenValidatorFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,9 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,14 +37,18 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/login", "/api/books/**", "/api/reviews/**").permitAll()
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/login").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(fr -> fr.successHandler(authenticationSuccessHandler())
-                                    .failureHandler(authenticationFailureHandler()))
-                .httpBasic(Customizer.withDefaults())
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()));
 
 //        http.csrf(customizer  -> customizer.ignoringRequestMatchers("api//books/reviews"));
+
+        http.httpBasic(ht -> ht.authenticationEntryPoint(authenticationEntryPoint()));
+        http.formLogin(fr -> fr.successHandler(authenticationSuccessHandler()).failureHandler(authenticationFailureHandler()).disable());
+
+        http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -57,6 +66,12 @@ public class SecurityConfiguration {
         return source;
     }
 
+
+    @Bean
+    AuthenticationEntryPoint authenticationEntryPoint() {
+        return new LibraryAuthenticationEntryPoint();
+    }
+
     @Bean
     AuthenticationSuccessHandler authenticationSuccessHandler(){
         return new LibraryAuthenticationSuccessHandler();
@@ -65,6 +80,13 @@ public class SecurityConfiguration {
     @Bean
     AuthenticationFailureHandler authenticationFailureHandler() {
         return new LibraryAuthenticationFailureHandler();
+    }
+
+    static class LibraryAuthenticationEntryPoint implements AuthenticationEntryPoint{// For handling failures of basic auth
+        @Override
+        public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+            response.addHeader("Failure", "Failed to login basic auth");
+        }
     }
 
     static class LibraryAuthenticationSuccessHandler implements AuthenticationSuccessHandler{
@@ -77,7 +99,7 @@ public class SecurityConfiguration {
     static class LibraryAuthenticationFailureHandler implements AuthenticationFailureHandler{
         @Override
         public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-            response.addHeader("Failure", exception.getMessage());
+            response.addHeader("Failure", "Failed login form-based");
         }
     }
 
