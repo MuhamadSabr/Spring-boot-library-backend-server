@@ -1,6 +1,7 @@
 package com.mmd.library.configuration;
 
 import com.mmd.library.filter.JWTTokenGeneratorFilter;
+import com.mmd.library.filter.JWTTokenRefresher;
 import com.mmd.library.filter.JWTTokenValidatorFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,7 @@ public class SecurityConfiguration {
         http.formLogin(fr -> fr.successHandler(authenticationSuccessHandler()).failureHandler(authenticationFailureHandler()).disable());
 
         http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new JWTTokenRefresher(), BasicAuthenticationFilter.class);
         http.addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
