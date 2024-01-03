@@ -23,9 +23,10 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwt = request.getHeader(SecurityConstants.JWT_HEADER).substring(6).trim();
-        if(!jwt.isBlank()){
+        String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
+        if(jwt!=null && jwt.startsWith("Bearer ")){
             try{
+                jwt = jwt.substring(6).trim();
                 SecretKey secretKey = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
                 Claims claims = Jwts.parser()
                         .verifyWith(secretKey)
@@ -48,6 +49,8 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getServletPath().equals("/login") || request.getServletPath().equals("/refreshJwtToken");
+        return request.getServletPath().equals("/login")
+                || request.getServletPath().equals("/logout")
+                || request.getServletPath().equals("/refreshJwtToken");
     }
 }
