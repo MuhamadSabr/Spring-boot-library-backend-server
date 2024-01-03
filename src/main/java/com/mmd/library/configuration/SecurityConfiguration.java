@@ -85,7 +85,8 @@ public class SecurityConfiguration {
     static class LibraryAuthenticationEntryPoint implements AuthenticationEntryPoint{// For handling failures of basic auth
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-            response.addHeader("Failure", "Failed to login basic auth");
+            response.addHeader("Failure", "Failed to login basic auth, " + authException.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
