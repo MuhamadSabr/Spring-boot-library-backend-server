@@ -26,4 +26,10 @@ public class Checkout {
 
     public Checkout() {}
 
+    public Checkout(String userEmail, String checkoutDate, String returnDate, long bookId) {
+        this.userEmail = userEmail;
+        this.checkoutDate = checkoutDate;
+        this.returnDate = returnDate;
+        this.bookId = bookId;
+    }
 }
