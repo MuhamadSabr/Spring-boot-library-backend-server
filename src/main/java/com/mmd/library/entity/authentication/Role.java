@@ -1,14 +1,12 @@
 package com.mmd.library.entity.authentication;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-@Data
 public class Role {
     @Id
     private String role;
@@ -26,4 +24,27 @@ public class Role {
     )
     private Set<User> members = new HashSet<>();
 
+    public Set<User> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<User> members) {
+        this.members = members;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
