@@ -29,4 +29,14 @@ public class Review {
 
     @Column(name = "review_description")
     String reviewDescription;
+
+    public Review() {}
+
+    public Review(String userEmail, LocalDate reviewDate, double rating, Long bookId, String reviewDescription) {
+        this.userEmail = userEmail;
+        this.reviewDate = reviewDate;
+        this.rating = rating;
+        this.bookId = bookId;
+        this.reviewDescription = reviewDescription;
+    }
 }

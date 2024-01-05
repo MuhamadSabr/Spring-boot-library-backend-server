@@ -5,6 +5,7 @@ import com.mmd.library.Repository.CheckoutRepository;
 import com.mmd.library.entity.Book;
 import com.mmd.library.entity.Checkout;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -20,6 +21,7 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
+    @Transactional
     public Checkout checkoutBook(String userEmail, long bookId) throws Exception{
 
         Optional<Book> book = bookRepository.findById(bookId);
