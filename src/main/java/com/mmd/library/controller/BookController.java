@@ -1,12 +1,16 @@
 package com.mmd.library.controller;
 
 import com.mmd.library.constant.SecurityConstants;
+import com.mmd.library.dto.ShelfCurrentLoansResponse;
 import com.mmd.library.entity.Checkout;
 import com.mmd.library.service.BookService;
 import com.mmd.library.util.JWTExtractor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
@@ -41,4 +45,15 @@ public class BookController {
     public ResponseEntity<Integer> currentCheckedOutCountByUser(@RequestHeader(name = SecurityConstants.JWT_HEADER) String jwtToken){
         return ResponseEntity.ok(bookService.currentCheckedOutCountByUser(JWTExtractor.getUsername(jwtToken)));
     }
+
+    @GetMapping("/currentLoans")
+    public ResponseEntity<List<ShelfCurrentLoansResponse>> currentLoans(@RequestHeader(name = SecurityConstants.JWT_HEADER) String jwtToken){
+        try{
+            return ResponseEntity.ok(bookService.currentLoans(JWTExtractor.getUsername(jwtToken)));
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Exception", ex.getMessage()).body(null);
+        }
+    }
+
 }

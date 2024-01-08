@@ -23,7 +23,7 @@ public class ReviewController {
     public ResponseEntity<String> addReview(@RequestHeader(name = SecurityConstants.JWT_HEADER) String jwtToken, @RequestBody ReviewDTO newReview){
         try{
             reviewService.addReview(JWTExtractor.getUsername(jwtToken), newReview);
-            return ResponseEntity.ok("Successful operation");
+            return ResponseEntity.ok("Success");
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

@@ -39,7 +39,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/books/checkout/**", "/api/books/currentCheckedOutCountByUser",
+                        .requestMatchers("/api/books/checkout/**", "/api/books/currentCheckedOutCountByUser", "/api/books/currentLoans",
                                 "/api/books/isCheckedOutByUser/**", "/api/reviews/add", "/api/reviews/hasUserLeftReview/**").authenticated()
                         .requestMatchers("/login", "/logout", "/api/books/**", "/api/reviews/**").permitAll()
                         .anyRequest().authenticated())
