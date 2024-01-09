@@ -40,7 +40,8 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/books/checkout/**", "/api/books/currentCheckedOutCountByUser", "/api/books/currentLoans",
-                                "/api/books/isCheckedOutByUser/**", "/api/reviews/add", "/api/reviews/hasUserLeftReview/**").authenticated()
+                                "/api/books/isCheckedOutByUser/**", "/api/reviews/add", "/api/reviews/hasUserLeftReview/**",
+                                "/api/books/returnCheckedOutBook/**", "/api/books/renewCheckedOutBook/**").authenticated()
                         .requestMatchers("/login", "/logout", "/api/books/**", "/api/reviews/**").permitAll()
                         .anyRequest().authenticated())
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()));

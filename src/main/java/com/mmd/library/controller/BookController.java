@@ -56,4 +56,26 @@ public class BookController {
         }
     }
 
+    @PutMapping("/returnCheckedOutBook/{bookId}")
+    public ResponseEntity<String> returnCheckedOutBook(@RequestHeader(name = SecurityConstants.JWT_HEADER) String jwtToken, @PathVariable long bookId){
+        try{
+            bookService.returnBook(JWTExtractor.getUsername(jwtToken), bookId);
+            return ResponseEntity.ok("Success");
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Exception", ex.getMessage()).body(ex.getMessage());
+        }
+    }
+
+    @PutMapping("/renewCheckedOutBook/{bookId}")
+    public ResponseEntity<String> renewCheckedOutBook(@RequestHeader(name = SecurityConstants.JWT_HEADER) String jwtToken, @PathVariable long bookId){
+        try{
+            bookService.renewLoan(JWTExtractor.getUsername(jwtToken), bookId);
+            return ResponseEntity.ok("Success");
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Exception", ex.getMessage()).body(ex.getMessage());
+        }
+    }
+
 }

@@ -76,4 +76,35 @@ public class BookService {
         return currentLoansResponses;
     }
 
+    @Transactional
+    public void returnBook(String userEmail, long bookId) throws Exception{
+        Optional<Book> book = bookRepository.findById(bookId);
+        if(book.isEmpty()){
+            throw new Exception("Book with id %d does not exist".formatted(bookId));
+        }
+
+        Checkout checkedOut = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
+        if(checkedOut==null){
+            throw new Exception("User %s does not have book with id %d checked out".formatted(userEmail, bookId));
+        }
+
+        book.get().setCopiesAvailable(book.get().getCopiesAvailable()+1);
+        bookRepository.save(book.get());
+        checkoutRepository.delete(checkedOut);
+    }
+
+    @Transactional
+    public void renewLoan(String userEmail, long bookId) throws Exception{
+        Checkout checkedOut = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
+        if(checkedOut==null){
+            throw new Exception("Either the book does not exist or, User %s does not have book with id %d checked out".formatted(userEmail, bookId));
+        }
+        if((LocalDate.parse(checkedOut.getReturnDate()).toEpochDay()) - (LocalDate.now().toEpochDay()) >0) {
+            checkedOut.setReturnDate(LocalDate.now().plusDays(7).toString());
+            checkoutRepository.save(checkedOut);
+        }else{
+            throw new Exception("Over-due books cannot be renewed");
+        }
+    }
+
 }
