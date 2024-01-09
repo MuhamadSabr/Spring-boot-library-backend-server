@@ -2,9 +2,11 @@ package com.mmd.library.service;
 
 import com.mmd.library.Repository.BookRepository;
 import com.mmd.library.Repository.CheckoutRepository;
+import com.mmd.library.Repository.HistoryRepository;
 import com.mmd.library.dto.ShelfCurrentLoansResponse;
 import com.mmd.library.entity.Book;
 import com.mmd.library.entity.Checkout;
+import com.mmd.library.entity.History;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +20,12 @@ public class BookService {
 
     private CheckoutRepository checkoutRepository;
     private BookRepository bookRepository;
+    private HistoryRepository historyRepository;
 
-    public BookService(CheckoutRepository checkoutRepository, BookRepository bookRepository){
+    public BookService(CheckoutRepository checkoutRepository, BookRepository bookRepository, HistoryRepository historyRepository){
         this.checkoutRepository = checkoutRepository;
         this.bookRepository = bookRepository;
+        this.historyRepository = historyRepository;
     }
 
     @Transactional
@@ -91,6 +95,9 @@ public class BookService {
         book.get().setCopiesAvailable(book.get().getCopiesAvailable()+1);
         bookRepository.save(book.get());
         checkoutRepository.delete(checkedOut);
+        History history = new History(checkedOut.getUserEmail(), checkedOut.getCheckoutDate(), LocalDate.now().toString(),
+                book.get().getTitle(), book.get().getAuthor(), book.get().getDescription(), book.get().getImage());
+        historyRepository.save(history);
     }
 
     @Transactional

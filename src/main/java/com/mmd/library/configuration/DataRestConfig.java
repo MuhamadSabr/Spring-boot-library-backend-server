@@ -1,6 +1,7 @@
 package com.mmd.library.configuration;
 
 import com.mmd.library.entity.Book;
+import com.mmd.library.entity.History;
 import com.mmd.library.entity.Review;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -22,10 +23,13 @@ public class DataRestConfig implements RepositoryRestConfigurer {
                 .allowedOrigins(allowedOrigin);
         cors.addMapping(config.getBasePath() + "/reviews/**")
                 .allowedOrigins(allowedOrigin);
+        cors.addMapping(config.getBasePath() + "/histories/**")
+                .allowedOrigins(allowedOrigin);
 
 
         config.exposeIdsFor(Book.class);
         config.exposeIdsFor(Review.class);
+        config.exposeIdsFor(History.class);
 
 
         HttpMethod [] disabledHttpMethods = {HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.PATCH, HttpMethod.POST};
@@ -33,6 +37,7 @@ public class DataRestConfig implements RepositoryRestConfigurer {
 
         disableUnsupportedMethods(Book.class,   config, disabledHttpMethods);
         disableUnsupportedMethods(Review.class, config, disabledHttpMethods);
+        disableUnsupportedMethods(History.class, config, disabledHttpMethods);
 
     }
 
