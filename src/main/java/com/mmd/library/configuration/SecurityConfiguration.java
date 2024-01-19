@@ -1,5 +1,6 @@
 package com.mmd.library.configuration;
 
+import com.mmd.library.constant.RoleConstants;
 import com.mmd.library.filter.JWTTokenGeneratorFilter;
 import com.mmd.library.filter.JWTTokenRefresher;
 import com.mmd.library.filter.JWTTokenValidatorFilter;
@@ -39,6 +40,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("api/messages/admin/**", "api/messages/search/findByClosed").hasRole(RoleConstants.ADMIN.name())
                         .requestMatchers(
                                 "/api/books/checkout/**", "/api/books/currentCheckedOutCountByUser", "/api/books/currentLoans",
                                 "/api/books/isCheckedOutByUser/**", "/api/reviews/add", "/api/reviews/hasUserLeftReview/**",
