@@ -3,6 +3,7 @@ package com.mmd.library.controller;
 import com.mmd.library.constant.SecurityConstants;
 import com.mmd.library.dto.AddBookDTO;
 import com.mmd.library.dto.AdminMessageResponse;
+import com.mmd.library.entity.Book;
 import com.mmd.library.service.AdminService;
 import com.mmd.library.service.MessageService;
 import com.mmd.library.util.JWTExtractor;
@@ -40,4 +41,25 @@ public class AdminController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PutMapping("/updateBook")
+	public ResponseEntity<String> updateBookStatus(@RequestBody Book book){
+		try{
+			adminService.updateBookStatus(book);
+			return ResponseEntity.ok().build();
+		}
+		catch (Exception exp){
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exp.getMessage());
+		}
+	}
+
+	@DeleteMapping("/deleteBook/{bookId}")
+	public ResponseEntity<String> deleteBook(@PathVariable(name = "bookId") long bookId){
+		try{
+			adminService.deleteBookById(bookId);
+			return ResponseEntity.ok().build();
+		}
+		catch (Exception exp){
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exp.getMessage());
+		}
+	}
 }
