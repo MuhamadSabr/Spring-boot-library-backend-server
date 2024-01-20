@@ -1,5 +1,6 @@
 package com.mmd.library.entity;
 
+import com.mmd.library.dto.AddBookDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,5 +28,17 @@ public class Book {
 
 	@Column(name = "img")
 	private String image;
+
+	public Book() {}
+
+	public Book(AddBookDTO addBookDTO){
+		this.title = addBookDTO.getTitle();
+		this.author = addBookDTO.getAuthor();
+		this.description = addBookDTO.getDescription();
+		this.copies = addBookDTO.getCopies();
+		this.copiesAvailable = addBookDTO.getCopies();
+		this.category = addBookDTO.getCategory();
+		this.image = addBookDTO.getImage();
+	}
 
 }

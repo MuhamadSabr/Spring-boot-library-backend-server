@@ -24,16 +24,4 @@ public class MessageController {
         messageService.postMessage(JWTExtractor.getUsername(jwtToken), message);
         return ResponseEntity.ok().build();
     }
-
-    @PutMapping("/admin/responseMessage")
-    public ResponseEntity<String> updateMessageResponse(@RequestHeader(name = SecurityConstants.JWT_HEADER) String jwtToken,
-                                                        @RequestBody AdminMessageResponse adminMessageResponse){
-        try{
-            messageService.updateMessageResponse(adminMessageResponse, JWTExtractor.getUsername(jwtToken));
-            return ResponseEntity.ok().build();
-        }
-        catch (Exception exp){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exp.getMessage());
-        }
-    }
 }
