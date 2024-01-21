@@ -19,7 +19,7 @@ public class DataRestConfig implements RepositoryRestConfigurer {
         config.setBasePath("api");
 
         //CORS Configuration
-        String allowedOrigin = "http://localhost:3000";
+        String allowedOrigin = "https://localhost:3000";
         cors.addMapping(config.getBasePath() + "/books/**")
                 .allowedOrigins(allowedOrigin);
         cors.addMapping(config.getBasePath() + "/reviews/**")
