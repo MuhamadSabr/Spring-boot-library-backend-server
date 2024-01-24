@@ -28,6 +28,10 @@ public class DataRestConfig implements RepositoryRestConfigurer {
                 .allowedOrigins(allowedOrigin);
         cors.addMapping(config.getBasePath() + "/messages/**")
                 .allowedOrigins(allowedOrigin);
+        cors.addMapping(config.getBasePath() + "/admin/**")
+                .allowedOrigins(allowedOrigin);
+        cors.addMapping(config.getBasePath() + "/payment/**")
+                .allowedOrigins(allowedOrigin);
 
 
         config.exposeIdsFor(Book.class);

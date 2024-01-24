@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/books/checkout/**", "/api/books/currentCheckedOutCountByUser", "/api/books/currentLoans",
                                 "/api/books/isCheckedOutByUser/**", "/api/reviews/add", "/api/reviews/hasUserLeftReview/**",
-                                "/api/books/returnCheckedOutBook/**", "/api/books/renewCheckedOutBook/**", "api/messages/**"
+                                "/api/books/returnCheckedOutBook/**", "/api/books/renewCheckedOutBook/**", "api/messages/**", "api/payment/**"
                         ).authenticated()
                         .requestMatchers("/login", "/logout", "/api/books/**", "/api/reviews/**").permitAll()
                         .anyRequest().authenticated())

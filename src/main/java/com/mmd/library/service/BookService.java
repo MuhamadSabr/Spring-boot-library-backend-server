@@ -3,10 +3,12 @@ package com.mmd.library.service;
 import com.mmd.library.Repository.BookRepository;
 import com.mmd.library.Repository.CheckoutRepository;
 import com.mmd.library.Repository.HistoryRepository;
+import com.mmd.library.Repository.PaymentRepository;
 import com.mmd.library.dto.ShelfCurrentLoansResponse;
 import com.mmd.library.entity.Book;
 import com.mmd.library.entity.Checkout;
 import com.mmd.library.entity.History;
+import com.mmd.library.entity.Payment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +23,13 @@ public class BookService {
     private CheckoutRepository checkoutRepository;
     private BookRepository bookRepository;
     private HistoryRepository historyRepository;
+    private PaymentRepository paymentRepository;
 
-    public BookService(CheckoutRepository checkoutRepository, BookRepository bookRepository, HistoryRepository historyRepository){
+    public BookService(CheckoutRepository checkoutRepository, BookRepository bookRepository, HistoryRepository historyRepository, PaymentRepository paymentRepository){
         this.checkoutRepository = checkoutRepository;
         this.bookRepository = bookRepository;
         this.historyRepository = historyRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -42,6 +46,18 @@ public class BookService {
         Checkout checkedOut = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
         if(checkedOut!=null){
             throw new Exception("User %s has book with id %d, already checked out".formatted(userEmail, bookId));
+        }
+
+        List<Checkout> alreadyCheckedOutBooks = checkoutRepository.findByUserEmail(userEmail);
+        for(Checkout ch : alreadyCheckedOutBooks){
+            if((LocalDate.parse(ch.getReturnDate()).toEpochDay()) - (LocalDate.now().toEpochDay()) <0) {
+                throw new Exception("User: " + userEmail + " has Over-due books, User has to return book and pay late fees to be able to checkout new books");
+            }
+        }
+
+        Payment payment = paymentRepository.findByUserEmail(userEmail);
+        if(payment!=null){
+            throw new Exception("User: " + userEmail + " has to pay outstanding late-fees to be able to checkout new books");
         }
 
         Checkout newCheckout = new Checkout(userEmail, LocalDate.now().toString(), LocalDate.now().plusDays(7).toString(), bookId);
@@ -90,6 +106,12 @@ public class BookService {
         Checkout checkedOut = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
         if(checkedOut==null){
             throw new Exception("User %s does not have book with id %d checked out".formatted(userEmail, bookId));
+        }
+
+        long daysLeft = (LocalDate.parse(checkedOut.getReturnDate()).toEpochDay()) - (LocalDate.now().toEpochDay());
+        if(daysLeft<0) {
+            Payment payment = new Payment(userEmail, (daysLeft*-1)*5);
+            paymentRepository.save(payment);
         }
 
         book.get().setCopiesAvailable(book.get().getCopiesAvailable()+1);
