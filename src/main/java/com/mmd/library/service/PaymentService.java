@@ -42,7 +42,7 @@ public class PaymentService {
 			throw new Exception("Payment information is missing");
 		}
 		if((Double.valueOf(payment.getAmount()).intValue()*100 )!=paymentInfo.getAmount()){
-			throw new Exception("Payment amount does match match the outstanding late-fee");
+			throw new Exception("Payment amount does not match the outstanding late-fee");
 		}
 		paymentRepository.delete(payment);
 	}

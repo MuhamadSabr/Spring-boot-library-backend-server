@@ -1,14 +1,17 @@
 package com.mmd.library.configuration;
 
 import com.mmd.library.constant.RoleConstants;
+import com.mmd.library.exception.EmailNotConfirmedException;
 import com.mmd.library.filter.JWTTokenGeneratorFilter;
 import com.mmd.library.filter.JWTTokenRefresher;
 import com.mmd.library.filter.JWTTokenValidatorFilter;
+import com.mmd.library.service.LibraryUserDetailsService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,6 +37,8 @@ import java.util.List;
 @Configuration
 public class SecurityConfiguration {
 
+
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
@@ -46,12 +51,11 @@ public class SecurityConfiguration {
                                 "/api/books/isCheckedOutByUser/**", "/api/reviews/add", "/api/reviews/hasUserLeftReview/**",
                                 "/api/books/returnCheckedOutBook/**", "/api/books/renewCheckedOutBook/**", "api/messages/**", "api/payment/**"
                         ).authenticated()
-                        .requestMatchers("/login", "/logout", "/api/books/**", "/api/reviews/**").permitAll()
+                        .requestMatchers("/signup", "/login", "/logout", "/api/books/**", "/api/reviews/**", "/verify-email/**").permitAll()
                         .anyRequest().authenticated())
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()));
 
-        http.httpBasic(ht -> ht.authenticationEntryPoint(authenticationEntryPoint()));
-        http.formLogin(fr -> fr.successHandler(authenticationSuccessHandler()).failureHandler(authenticationFailureHandler()).disable());
+        http.httpBasic(httpSecurityHttpBasicConfigurer -> httpSecurityHttpBasicConfigurer.authenticationEntryPoint(authenticationEntryPoint()));
 
         http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class);
         http.addFilterAfter(new JWTTokenRefresher(), BasicAuthenticationFilter.class);
@@ -60,6 +64,7 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -67,7 +72,7 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(List.of("https://localhost:3000")); // Allow all origins
         configuration.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS")); // Allow all methods
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization", "Success", "Failure"));//Exposing header from backend to frontend
+        configuration.setExposedHeaders(List.of("Authorization"));//Exposing header from backend to frontend
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -80,37 +85,19 @@ public class SecurityConfiguration {
         return new LibraryAuthenticationEntryPoint();
     }
 
-    @Bean
-    AuthenticationSuccessHandler authenticationSuccessHandler(){
-        return new LibraryAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    AuthenticationFailureHandler authenticationFailureHandler() {
-        return new LibraryAuthenticationFailureHandler();
-    }
-
     static class LibraryAuthenticationEntryPoint implements AuthenticationEntryPoint{// For handling failures of basic auth
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-            response.addHeader("Failure", "Failed to login basic auth, " + authException.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            Throwable cause = authException.getCause();
+            if(cause instanceof EmailNotConfirmedException){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Email not confirmed: " + authException.getMessage());
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            }
         }
     }
 
-    static class LibraryAuthenticationSuccessHandler implements AuthenticationSuccessHandler{
-        @Override
-        public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-            response.addHeader("Success", "Success authentication");
-        }
-    }
-
-    static class LibraryAuthenticationFailureHandler implements AuthenticationFailureHandler{
-        @Override
-        public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-            response.addHeader("Failure", "Failed login form-based");
-        }
-    }
 
     @Bean
     PasswordEncoder passwordEncoder(){

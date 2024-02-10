@@ -1,6 +1,7 @@
 package com.mmd.library.service;
 
 import com.mmd.library.Repository.authentication.UserRepository;
+import com.mmd.library.exception.EmailNotConfirmedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,10 @@ public class LibraryUserDetailsService implements UserDetailsService {
         if (user.getRoles() == null) {
             throw new UsernameNotFoundException("No authorities are set for the user : " + username);
         }
+        if(user.getActive()==0){
+            throw new EmailNotConfirmedException("User has not confirmed their email");
+        }
+
         String userName = user.getUsername().trim();
         String password = user.getPassword().trim();
         user.getRoles().forEach(role-> authorities.add(new SimpleGrantedAuthority(role.getRole().trim())));

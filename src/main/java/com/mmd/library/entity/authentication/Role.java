@@ -16,6 +16,8 @@ public class Role {
     public Role(){}
 
 
+
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_roles",

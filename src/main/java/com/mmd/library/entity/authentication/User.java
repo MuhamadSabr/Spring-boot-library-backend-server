@@ -22,6 +22,13 @@ public class User {
 
     public  User(){}
 
+    public User(String username, Integer active, LocalDate dateCreated, String password, Set<Role> roles) {
+        this.username = username;
+        this.active = active;
+        this.dateCreated = dateCreated;
+        this.password = password;
+        this.roles = roles;
+    }
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
