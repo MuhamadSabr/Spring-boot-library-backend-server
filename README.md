@@ -5,3 +5,6 @@ Generates a JWT Token when a successful request to /login is sent that can be us
 Serves a /refreshJWTToken endpoint that the client side can use to refresh their nonexpired token with. These are achieved using Spring Security filters.
 Uses self-signed certificate to enable and accept only HTTPS communication
 Uses Stripe payment APIs to provide the backend configuration such as creating paymentIntent, completing payment, etc... to the frontend app to accept payment from clients.
+
+# Visit http://library-front-end.s3-website.eu-north-1.amazonaws.com/
+to see the app
